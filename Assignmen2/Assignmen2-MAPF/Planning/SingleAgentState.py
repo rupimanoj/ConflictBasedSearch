@@ -3,8 +3,10 @@ from Utils.constants import Action, NAV_ACTIONS
 
 class SingleAgentState:
 
-    def __init__(self, p, robot, g, action, conflicts=None, current_depth=None, consider_conflicts=False):
-        #conflicts is a set of time steps starting at 0, where there is a conflict
+    def __init__(self, p, robot, g, action, conflicts=None, current_depth=None):
+        # conflicts is a set of time steps starting at 0, where there is a conflict
+        # add conflict will be done in is_goal, and conflict is found
+        # if conflict is found, add the conflict to all robots except the first one
         self.robot = robot
         self.p = p
         self.g = g
@@ -19,7 +21,7 @@ class SingleAgentState:
             child_robot = self.robot.copy()
             child_robot.plan = [action, action]
             # find and add contrain here
-            if consider_conflicts and current_depth in conflict:
+            if current_depth in conflict:
                 continue
             try:
                 occupies = child_robot.step()
