@@ -18,43 +18,50 @@ class CBS_State:
         self.plans = plans  # The plans affiliated with this node. The plan for one agent needs to be updated (the
         # agent for which the new constraint applies to). g value must be updated accordingly.
 
-    # Generate all valid successors
+    # iterate over all robots and call "underlying algorithm" - single agent with conflict set - edit Robot.py to include a conflict set
+    # then do a "get path" for each agent
+    # collect the results into apt structure!! - TODO figure out what this apt structure is
+    # also update g value based on paths at end for loop
     def expand(self):
-        # Todo: Your job
-        raise NotImplementedError
+        pass
 
     # Return a list of list of actions
     # actions[i] points to a list of actions for robot i. actions[i][0] is the last action to be performed
     # actions[i][len(actions[i]) - 1] is the first (next) action to be performed.
     def get_plan(self, plans):
-        # Todo: Your job
-        raise NotImplementedError
+        for x in range(len(self.robots)):
+            plans.append([])
+        self.get_plan_r(plans)
+
+    def get_plan_r(self, plans):
+        if self.p is not None:
+            for x in range(len(self.actions)):
+                plans[x].append(self.actions[x])
+            self.p.get_plan_r(plans)
+        return
 
     # Return True if this is the goal state
     def is_goal(self):
-         # Todo: Your job
-        raise NotImplementedError
+        # check conflict
+        # if conflict add it to conflict to all agent except the first one
+        # otherwise return true
+        return True
 
-
-    # The following comparators are needed for the open and closed lists (used by Best-First Search)
     def __eq__(self, other):
-        # Todo: Your job
-        raise NotImplementedError
+        # check if all paths are same
+
+    def __hash__(self):
+        # hash paths?
 
     def __lt__(self, other):
-         # Todo: Your job
-        raise NotImplementedError
+         return self.g + self.h < other.g + other.h
 
     def __ge__(self, other):
-        # Todo: Your job
-        raise NotImplementedError
+        return not self < other
 
-    # Hash function needed for the closed list. For efficiency try to produce unique values for unique states
-    def __hash__(self):
-        # Todo: Your job
-        raise NotImplementedError
-
-    # Name the state for easy debugging
     def __str__(self):
-        # Todo: Your job
-        raise NotImplementedError
+        # not sure if this is correct...
+        ans = ''
+        for r in self.robots:
+            ans += "Robot[%d]-(%d,%d,%s,%d) " %(r.index,r.position_x, r.position_y, r.heading, r.velocity)
+        return ans
