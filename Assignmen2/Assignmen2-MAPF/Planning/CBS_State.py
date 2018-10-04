@@ -49,9 +49,11 @@ class CBS_State:
 
     def __eq__(self, other):
         # check if all paths are same
+        pass
 
     def __hash__(self):
         # hash paths?
+        pass
 
     def __lt__(self, other):
          return self.g + self.h < other.g + other.h

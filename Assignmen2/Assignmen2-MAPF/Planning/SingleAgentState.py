@@ -12,6 +12,8 @@ class SingleAgentState:
         self.g = g
         self.h = abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y)# TODO: Your job - Set a better heuristic value
         self.action = action
+        self.conflicts = conflicts
+        self.current_depth = current_depth
 
     def expand(self):
         successors = []
@@ -21,7 +23,7 @@ class SingleAgentState:
             child_robot = self.robot.copy()
             child_robot.plan = [action, action]
             # find and add contrain here
-            if current_depth in conflict:
+            if self.current_depth and self.current_depth in self.conflicts:
                 continue
             try:
                 occupies = child_robot.step()
