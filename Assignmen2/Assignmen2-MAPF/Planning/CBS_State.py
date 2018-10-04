@@ -23,7 +23,7 @@ class CBS_State:
     # collect the results into apt structure!! - TODO figure out what this apt structure is
     # also update g value based on paths at end for loop
     def expand(self):
-        pass
+        print("calling expand")
 
     # Return a list of list of actions
     # actions[i] points to a list of actions for robot i. actions[i][0] is the last action to be performed
@@ -45,14 +45,17 @@ class CBS_State:
         # check conflict
         # if conflict add it to conflict to all agent except the first one
         # otherwise return true
-        return True
+        return False
 
     def __eq__(self, other):
         # check if all paths are same
         pass
 
     def __hash__(self):
-        # hash paths?
+        ans = 0
+        for r in self.robots:
+            ans += hash(r)
+        return ans
         pass
 
     def __lt__(self, other):
