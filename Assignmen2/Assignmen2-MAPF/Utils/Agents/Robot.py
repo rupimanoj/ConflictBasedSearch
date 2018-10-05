@@ -12,7 +12,7 @@ from Planning.SingleAgentState import SingleAgentState as state
 
 class Robot:
 
-    def __init__(self, x,y,index, warehouse, job_manager):
+    def __init__(self, x,y,index, warehouse, job_manager, constraints={}):
         self.position_x = x
         self.position_y = y
         self.index = index
@@ -24,21 +24,24 @@ class Robot:
         self.warehouse = warehouse
         self.plan = [Action.no_op]
         self.job_manager = job_manager
+        self.constraints = constraints
 
     def copy(self):
-        cpy = Robot(self.position_x, self.position_y, self.index, self.warehouse, None)
+        cpy = Robot(self.position_x, self.position_y, self.index, self.warehouse, None, self.constraints)
         cpy.heading = self.heading
         cpy.velocity = self.velocity
         cpy.carry = self.carry
         cpy.goal_x = self.goal_x
         cpy.goal_y = self.goal_y
+        cpy.constraints = self.constraints
         return cpy
 
     def goal_copy(self):
-        cpy = Robot(self.goal_x, self.goal_y, self.index, self.warehouse, None)
+        cpy = Robot(self.goal_x, self.goal_y, self.index, self.warehouse, None, self.constraints)
         cpy.heading = None
         cpy.velocity = 0
         cpy.carry = None
+        cpy.constraints = self.constraints #required? Need to recheck
         return cpy
 
     def display(self, screen, offset_x, offset_y):
@@ -51,6 +54,39 @@ class Robot:
         screen.blit(image, [cons.cell_to_position(self.position_x, offset_x), cons.cell_to_position(self.position_y,
                                                                                                     offset_y)])
         cons.display_agent_label(self.position_x, self.position_y, offset_x, offset_y, self.index, screen)
+
+    def step_simulation(self, action):
+        self.perform_action(action)
+        occupies_cells = []
+        occupies_edges = []
+        if self.heading == 'N':
+            for dy in range(1, self.velocity + 1):
+                occupies_cells.append([self.position_x, self.position_y - dy])
+                occupies_edges.append([self.position_x, self.position_y - dy, 'S'])
+            self.position_y -= self.velocity
+        elif self.heading == 'S':
+            for dy in range(1, self.velocity + 1):
+                occupies_cells.append([self.position_x, self.position_y + dy])
+                occupies_edges.append([self.position_x, self.position_y + dy, 'N'])
+            self.position_y += self.velocity
+        elif self.heading == 'E':
+            for dx in range(1, self.velocity + 1):
+                occupies_cells.append([self.position_x + dx, self.position_y])
+                occupies_edges.append([self.position_x + dx, self.position_y, 'W'])
+            self.position_x += self.velocity
+        elif self.heading == 'W':
+            for dx in range(1, self.velocity + 1):
+                occupies_cells.append([self.position_x - dx, self.position_y])
+                occupies_edges.append([self.position_x - dx, self.position_y, 'E'])
+            self.position_x -= self.velocity
+        if self.velocity == 0:
+            occupies_cells.append([self.position_x,self.position_y])
+
+        if self.carry is not None:
+            self.carry.position_x = self.position_x
+            self.carry.position_y = self.position_y
+
+        return occupies_cells, occupies_edges
 
     def step(self):
 
@@ -189,7 +225,6 @@ class Robot:
     def at_goal(self):
         return self.position_x == self.goal_x and self.position_y == self.goal_y and self.velocity == 0
 
-
     def __eq__(self, other):
         if self.position_x != other.position_x:
             return False
@@ -210,13 +245,23 @@ class Robot:
     def __hash__(self):
         return hash(str(self.position_x) + str(self.position_y) + str(self.index) + self.heading + str(self.velocity))
 
+    def print_details(self):
+        print("id: ", self)
+        print("position :", self.position_x, self.position_y)
+        print("goal :", self.goal_x, self.goal_y)
+        print("velocity: ", self.velocity)
+        print("heading: ", self.heading)
+        print("constraints list ..")
+        for keys, value in self.constraints.items():
+            print("for timestamp ", keys, " there are ", len(value), " constraints ")
+        print("constraints list end ..")
 
 class RobotNoCarry(Robot):
 
     ma_planner = 'maA*'
 
-    def __init__(self, x,y,index, warehouse, job_manager):
-        Robot.__init__(self,x,y,index, warehouse, job_manager)
+    def __init__(self, x,y,index, warehouse, job_manager, constraints={}):
+        Robot.__init__(self,x,y,index, warehouse, job_manager, constraints)
 
 
     def plan_task(self):

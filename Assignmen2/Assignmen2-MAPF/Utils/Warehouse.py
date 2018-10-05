@@ -91,9 +91,7 @@ class Warehouse:
             root = MultiagentState(None,self.agents[0],0,None)
         elif planner == 'CBS':
             #robots, g, constraint, predecessor, plans
-            print("initializing CBS")
             root = CBS_State(self.agents[0], 0, None, None, None)
-        print("invoke plan")
         ma_plan = BestFirstSearch.plan(root)
         for x in range(len(ma_plan)):
             self.agents[0][x].plan = [Action.process,Action.process,Action.process,Action.process] + ma_plan[x]
