@@ -15,12 +15,15 @@ class BestFirstSearch:
             if u.is_goal():
                 ans = []
                 u.get_plan(ans)
-                # return plan
+                print(ans)
                 return ans
             else:
                 successors = u.expand()
                 if type(u).__name__ == 'CBS_State' and not successors:
-                    return u.plans
+                    ans = []
+                    u.get_plan(ans)
+                    print(ans)
+                    return ans
                 for v in successors:
                     #  if v is in closed
                     if v in closed:

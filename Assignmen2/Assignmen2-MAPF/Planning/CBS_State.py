@@ -112,8 +112,10 @@ class CBS_State:
     # actions[i] points to a list of actions for robot i. actions[i][0] is the last action to be performed
     # actions[i][len(actions[i]) - 1] is the first (next) action to be performed.
     def get_plan(self, plans):
-        for x in self.plans:
-            plans.append(x)
+        for i, plan in enumerate(self.plans):
+            plans.append([])
+            for action in plan:
+                plans[i].append(action)
 
     # Return True if this is the goal state
     def is_goal(self):
