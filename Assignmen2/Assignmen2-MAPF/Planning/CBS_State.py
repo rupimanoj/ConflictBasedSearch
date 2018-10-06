@@ -35,27 +35,32 @@ class CBS_State:
     # then do a "get path" for each agent
     # collect the results into apt structure!! - TODO figure out what this apt structure is
     # also update g value based on paths at end for loop
-    def generate_individual_pans(self):
+    def generate_individual_plans(self):
         temp_plans = []
         max_plan_len = -1
-        for r in self.robots:
-            r.plan_path()
-            self.g += len(r.plan) #assuming path length as total number of actions
-            max_plan_len = max(max_plan_len, len(r.plan))
-        for r in self.robots:
-            if len(r.plan) < max_plan_len:
-                b = [Action.no_op for i in range(max_plan_len - len(r.plan))]
-                r.plan = b + r.plan
-            temp_plans.append(r.plan)
+        child_robots = []
+        for robot in self.robots:
+            child_r = copy.deepcopy(robot)
+            child_r.plan_path()
+            self.g += len(child_r.plan) #assuming path length as total number of actions
+            max_plan_len = max(max_plan_len, len(child_r.plan))
+            child_robots.append(child_r)
+        for child_r, robot in zip(child_robots, self.robots):
+            if len(child_r.plan) < max_plan_len:
+                b = [Action.no_op] * (max_plan_len - len(child_r.plan))
+                robot.plan = b + child_r.plan
+            else:
+                robot.plan = child_r.plan
+            temp_plans.append(robot.plan)
 
         self.plans = temp_plans
 
     def expand(self):
         print("expand called")
         if(self.plans == None):
-            self.generate_individual_pans() #root node don't have plans initially'
+            self.generate_individual_plans() #root node don't have plans initially'
         succesors = []
-        local_time = 1
+        local_time = 0
         plan_length = len(self.robots[0].plan)
         for time in range(plan_length-1, -1, -1): #todo:check 0 or -1 in range
             grid_occupancy_dict = []
@@ -82,25 +87,25 @@ class CBS_State:
                         continue
                     else:
                         collision = self.is_colliding(robot_occupied_area, cross_check_area)
-                        if(collision):
+                        if collision:
                             # print("*******************************")
                             # print("collision occurs with robot ", i, "with robot", j)
                             # print("before adding constraint")
                             # for r in child_CBS.robots:
                             #     r.print_details()
                             conflict_found = True #robot has constraints dictionary with time as key
-                            print("adding constraint to robot", j)
+                            # print("adding constraint to robot", j)
                             if local_time in child_CBS.robots[j].constraints:
                                 child_CBS.robots[j].constraints[local_time].extend(robot_occupied_area)
                             else:
                                 child_CBS.robots[j].constraints = {local_time: robot_occupied_area}
-                            child_CBS.robots[j].plan = [Action.no_op]  ##invalidate the existing plan
-                            print("after adding constraint")
-                            for r in child_CBS.robots:
-                                r.print_details()
-                            print("*******************************")
+                            # child_CBS.robots[j].plan.clear()  ##invalidate the existing plan
+                            # print("after adding constraint")
+                            # for r in child_CBS.robots:
+                            #     r.print_details()
+                            # print("*******************************")
                 if conflict_found:
-                    child_CBS.generate_individual_pans()
+                    child_CBS.generate_individual_plans()
                     succesors.append(child_CBS)
             local_time += 1
         print("returning succesors ", len(succesors))

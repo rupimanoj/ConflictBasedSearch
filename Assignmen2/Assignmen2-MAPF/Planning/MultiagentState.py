@@ -10,7 +10,7 @@ class MultiagentState:
         self.g = g
         self.h = 0 # TODO: Your job. Set a better heuristic value
         for robot in robots:
-            self.h += abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y)
+            self.h += (abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y))/2
         self.actions = actions
 
     def expand_r(self, robot_index, successors, current_assignment, actions, g_child, occupied_cells, occupied_edges):

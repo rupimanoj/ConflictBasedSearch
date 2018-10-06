@@ -11,7 +11,7 @@ class BestFirstSearch:
         closed.insert(start_state)
         while open:
             u = heappop(open)
-            print("pick CBS state, ", u)
+            # print("pick CBS state, ", u)
             if u.is_goal():
                 ans = []
                 u.get_plan(ans)
@@ -19,7 +19,7 @@ class BestFirstSearch:
                 return ans
             else:
                 successors = u.expand()
-                if type(u).__name__ == 'CBS_State' and not successors:
+                if type(u).__name__ == 'CBS_State' and u.is_goal():
                     ans = []
                     u.get_plan(ans)
                     print(ans)

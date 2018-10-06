@@ -27,7 +27,7 @@ class Display:
     def update_screen(self):
         self.screen.fill(self.background_colour)
         self.warehouse.display(self.screen, self.offset_x, self.offset_y)
-        #sleep(0.05)
+        sleep(0.5)
         timer = cons.FONT_TIMER.render("{0:.1f}".format(self.time_elapsed), True, cons.BLACK,cons.WHITE)
         self.screen.blit(timer, (10,10))
         pygame.display.flip()

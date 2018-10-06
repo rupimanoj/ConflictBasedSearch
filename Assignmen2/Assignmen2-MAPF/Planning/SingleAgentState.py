@@ -10,7 +10,7 @@ class SingleAgentState:
         self.robot = robot
         self.p = p
         self.g = g
-        self.h = abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y)# TODO: Your job - Set a better heuristic value
+        self.h = (abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y))/2# TODO: Your job - Set a better heuristic value
         self.action = action
         # self.conflicts = conflicts
         # self.current_depth = current_depth
@@ -29,11 +29,11 @@ class SingleAgentState:
                 continue  # Ignore illegal actions
             constraints_obeyed = True
             for pos in occupies[0]: #before adding to succesor states check if they are in conflicting regions
-                if self.time_stamp+1 in self.robot.constraints and pos in self.robot.constraints[self.time_stamp+1]:
+                if self.time_stamp in self.robot.constraints and pos in self.robot.constraints[self.time_stamp]:
                     constraints_obeyed = False
                     print("not respecting constraints")
                     break
-            if child_robot.warehouse.are_open_cells(occupies[0], self.robot.carry) and constraints_obeyed:
+            if constraints_obeyed and child_robot.warehouse.are_open_cells(occupies[0], self.robot.carry):
                 successors.append(SingleAgentState(self, child_robot, self.g + 1, action, self.time_stamp+1))
                 #TODO:need to recheck if this time_stamp is correct
         return successors
