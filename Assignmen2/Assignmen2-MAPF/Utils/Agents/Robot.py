@@ -61,26 +61,26 @@ class Robot:
         occupies_edges = []
         if self.heading == 'N':
             for dy in range(1, self.velocity + 1):
-                occupies_cells.append([self.position_x, self.position_y - dy])
-                occupies_edges.append([self.position_x, self.position_y - dy, 'S'])
+                occupies_cells.append((self.position_x, self.position_y - dy))
+                occupies_edges.append((self.position_x, self.position_y - dy, 'S'))
             self.position_y -= self.velocity
         elif self.heading == 'S':
             for dy in range(1, self.velocity + 1):
-                occupies_cells.append([self.position_x, self.position_y + dy])
-                occupies_edges.append([self.position_x, self.position_y + dy, 'N'])
+                occupies_cells.append((self.position_x, self.position_y + dy))
+                occupies_edges.append((self.position_x, self.position_y + dy, 'N'))
             self.position_y += self.velocity
         elif self.heading == 'E':
             for dx in range(1, self.velocity + 1):
-                occupies_cells.append([self.position_x + dx, self.position_y])
-                occupies_edges.append([self.position_x + dx, self.position_y, 'W'])
+                occupies_cells.append((self.position_x + dx, self.position_y))
+                occupies_edges.append((self.position_x + dx, self.position_y, 'W'))
             self.position_x += self.velocity
         elif self.heading == 'W':
             for dx in range(1, self.velocity + 1):
-                occupies_cells.append([self.position_x - dx, self.position_y])
-                occupies_edges.append([self.position_x - dx, self.position_y, 'E'])
+                occupies_cells.append((self.position_x - dx, self.position_y))
+                occupies_edges.append((self.position_x - dx, self.position_y, 'E'))
             self.position_x -= self.velocity
         if self.velocity == 0:
-            occupies_cells.append([self.position_x,self.position_y])
+            occupies_cells.append((self.position_x,self.position_y))
 
         if self.carry is not None:
             self.carry.position_x = self.position_x

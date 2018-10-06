@@ -7,6 +7,8 @@ class BestFirstSearch:
     def plan(start_state):
         open = []
         closed = ClosedList()
+        if type(start_state).__name__ == 'CBS_State':
+            print("YYYYYY plan called YYYYYYYYYY")
         heappush(open, start_state)
         closed.insert(start_state)
         while open:

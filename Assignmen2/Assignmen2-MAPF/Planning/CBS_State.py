@@ -23,13 +23,26 @@ class CBS_State:
         cpy = CBS_State(self.robots, self.g, self.constraint, self.p, self.plans)
         return cpy
 
-    #todo: can we use functions in CollisionDetection.py instead of below function?
-    def is_colliding(self, covered_area, check_area): #TODO: write colliding function
-        for pos1 in covered_area:
-            for pos2 in check_area:
-                if(pos1[0] == pos2[0] and pos1[1] == pos2[1]):
-                    return True
+    def opposite(self, heading_1, heading_2):
+        if heading_1 == 'N' and heading_2 == 'S':
+            return True
+        if heading_1 == 'S' and heading_2 == 'N':
+            return True
+        if heading_1 == 'W' and heading_2 == 'E':
+            return True
+        if heading_1 == 'E' and heading_2 == 'W':
+            return True
         return False
+
+    def is_colliding(self, r_i_area, r_j_area, orig_pos_i, is_opposite):
+        constraint_list = []
+        occupied = set(r_i_area)
+        for pos in r_j_area:
+            if pos in occupied:
+                constraint_list.append(pos)
+        if (orig_pos_i[0], orig_pos_i[1]) in r_j_area and is_opposite:
+            constraint_list.append((orig_pos_i[0], orig_pos_i[1]))
+        return constraint_list
 
     # iterate over all robots and call "underlying algorithm" - single agent with conflict set - edit Robot.py to include a conflict set
     # then do a "get path" for each agent
@@ -60,50 +73,41 @@ class CBS_State:
         if(self.plans == None):
             self.generate_individual_plans() #root node don't have plans initially'
         succesors = []
-        local_time = 0
+        local_time = 1
         plan_length = len(self.robots[0].plan)
+        child_robots = []
+        for robot in self.robots:
+            child_r = copy.deepcopy(robot)
+            child_robots.append(child_r)
         for time in range(plan_length-1, -1, -1): #todo:check 0 or -1 in range
             grid_occupancy_dict = []
-            for idx, r in enumerate(self.robots):
+            orig_pos = []
+            for robot in child_robots:
+                occupies = ([], [])
+                orig_pos.append((robot.position_x, robot.position_y))
                 try:
-                    occupies = r.step_simulation(r.plan[time])
-                    #print("  after performing action  ", r.plan[i])
-                    #r.print_details()
-                    #print("robot  ", idx , "occupies at time", local_time)
-                    #for location in occupies[0]:
-                    #    print("X: ", location[0], " Y: ", location[1], "  *** ", end="")
-                    #print("   ")
+                    occupies = robot.step_simulation(robot.plan[time])
                 except ValueError:
                     continue  # Ignore illegal actions due to existing constraints and boundary conditions
 
                 grid_occupancy_dict.append(occupies[0])
 
-            for i,robot_occupied_area in enumerate(grid_occupancy_dict):
-                conflict_found = False
+            for i,r_i_area in enumerate(grid_occupancy_dict):
                 child_CBS =  copy.deepcopy(self)
                 child_CBS.p = self
-                for j, cross_check_area in enumerate(grid_occupancy_dict): #brute force n*n check for collisions, should improve it
+                conflict_found = False
+                for j, r_j_area in enumerate(grid_occupancy_dict): #brute force n*n check for collisions, should improve it
                     if i == j:
                         continue
                     else:
-                        collision = self.is_colliding(robot_occupied_area, cross_check_area)
-                        if collision:
-                            # print("*******************************")
-                            # print("collision occurs with robot ", i, "with robot", j)
-                            # print("before adding constraint")
-                            # for r in child_CBS.robots:
-                            #     r.print_details()
-                            conflict_found = True #robot has constraints dictionary with time as key
-                            # print("adding constraint to robot", j)
+                        is_opposite = self.opposite(child_robots[i].heading, child_robots[j].heading)
+                        constraint_list = self.is_colliding(r_i_area, r_j_area, orig_pos[i], is_opposite)
+                        if len(constraint_list) > 0:
+                            conflict_found = True
                             if local_time in child_CBS.robots[j].constraints:
-                                child_CBS.robots[j].constraints[local_time].extend(robot_occupied_area)
+                                child_CBS.robots[j].constraints[local_time].extend(constraint_list)
                             else:
-                                child_CBS.robots[j].constraints = {local_time: robot_occupied_area}
-                            # child_CBS.robots[j].plan.clear()  ##invalidate the existing plan
-                            # print("after adding constraint")
-                            # for r in child_CBS.robots:
-                            #     r.print_details()
-                            # print("*******************************")
+                                child_CBS.robots[j].constraints = {local_time: constraint_list}
                 if conflict_found:
                     child_CBS.generate_individual_plans()
                     succesors.append(child_CBS)
@@ -131,12 +135,15 @@ class CBS_State:
 
     def __eq__(self, other):
         # check if all paths are same
-        pass
+        for x in range(len(self.robots)):
+            if self.robots[x].plan != other.robots[x].plan or self.robots[x].constraints != other.robots[x].constraints:
+                return False
+        return True
 
     def __hash__(self):
         ans = 0
-        for r in self.robots:
-            ans += hash(r)
+        for robot in self.robots:
+            ans += hash(robot) + hash(robot.plan.__str__()) + hash(robot.constraints.__str__())
         return ans
         pass
 
@@ -149,6 +156,6 @@ class CBS_State:
     def __str__(self):
         # not sure if this is correct...
         ans = ''
-        for r in self.robots:
-            ans += "Robot[%d]-(%d,%d,%s,%d) " %(r.index,r.position_x, r.position_y, r.heading, r.velocity)
+        for robot in self.robots:
+            ans += "Robot[%d]-(%d,%d,%s,%d) " %(robot.index,robot.position_x, robot.position_y, robot.heading, robot.velocity)
         return ans

@@ -29,12 +29,12 @@ class SingleAgentState:
                 continue  # Ignore illegal actions
             constraints_obeyed = True
             for pos in occupies[0]: #before adding to succesor states check if they are in conflicting regions
-                if self.time_stamp in self.robot.constraints and pos in self.robot.constraints[self.time_stamp]:
+                if self.time_stamp + 1 in self.robot.constraints and tuple(pos) in self.robot.constraints[self.time_stamp + 1]:
                     constraints_obeyed = False
-                    print("not respecting constraints")
+                    print("XXXXX constraint found XXXXX")
                     break
             if constraints_obeyed and child_robot.warehouse.are_open_cells(occupies[0], self.robot.carry):
-                successors.append(SingleAgentState(self, child_robot, self.g + 1, action, self.time_stamp+1))
+                successors.append(SingleAgentState(self, child_robot, self.g + 1, action, self.time_stamp + 1))
                 #TODO:need to recheck if this time_stamp is correct
         return successors
 
