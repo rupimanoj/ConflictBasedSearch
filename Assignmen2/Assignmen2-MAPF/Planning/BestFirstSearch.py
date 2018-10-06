@@ -17,14 +17,14 @@ class BestFirstSearch:
             if u.is_goal():
                 ans = []
                 u.get_plan(ans)
-                print(ans)
+                # print(ans)
                 return ans
             else:
                 successors = u.expand()
                 if type(u).__name__ == 'CBS_State' and u.is_goal():
                     ans = []
                     u.get_plan(ans)
-                    print(ans)
+                    # print(ans)
                     return ans
                 for v in successors:
                     #  if v is in closed

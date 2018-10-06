@@ -79,7 +79,10 @@ class CBS_State:
         for robot in self.robots:
             child_r = copy.deepcopy(robot)
             child_robots.append(child_r)
+        break_outer = False
         for time in range(plan_length-1, -1, -1): #todo:check 0 or -1 in range
+            if break_outer:
+                break
             grid_occupancy_dict = []
             orig_pos = []
             for robot in child_robots:
@@ -111,10 +114,16 @@ class CBS_State:
                 if conflict_found:
                     child_CBS.generate_individual_plans()
                     succesors.append(child_CBS)
+                    break_outer = True
             local_time += 1
         print("returning succesors ", len(succesors))
+        print("__________________________")
+        for succesor in succesors:
+            print(succesor.plans)
+        print(succesors)
         if not succesors:
             self.no_conflicts = True
+        print("returned")
         return succesors
 
     # Return a list of list of actions
@@ -136,14 +145,14 @@ class CBS_State:
     def __eq__(self, other):
         # check if all paths are same
         for x in range(len(self.robots)):
-            if self.robots[x].plan != other.robots[x].plan or self.robots[x].constraints != other.robots[x].constraints:
+            if self.robots[x].plan != other.robots[x].plan: # or self.robots[x].constraints != other.robots[x].constraints:
                 return False
         return True
 
     def __hash__(self):
         ans = 0
         for robot in self.robots:
-            ans += hash(robot) + hash(robot.plan.__str__()) + hash(robot.constraints.__str__())
+            ans += hash(robot) + hash(robot.plan.__str__()) # + hash(robot.constraints.__str__())
         return ans
         pass
 
