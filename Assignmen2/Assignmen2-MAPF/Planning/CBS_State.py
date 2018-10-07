@@ -2,6 +2,8 @@ from Utils.constants import Action, NAV_ACTIONS
 import Utils.constants as C
 import copy
 
+count = 0
+
 class CBS_State:
 
     def __init__(self, robots, g, constraint, predecessor, plans):
@@ -69,7 +71,10 @@ class CBS_State:
         self.plans = temp_plans
 
     def expand(self):
-        print("expand called")
+        global count
+        count += 1
+        # print(count)
+        # print("expand called")
         if(self.plans == None):
             self.generate_individual_plans() #root node don't have plans initially'
         succesors = []
@@ -107,23 +112,19 @@ class CBS_State:
                         constraint_list = self.is_colliding(r_i_area, r_j_area, orig_pos[i], is_opposite)
                         if len(constraint_list) > 0:
                             conflict_found = True
-                            if local_time in child_CBS.robots[j].constraints:
+                            if child_CBS.robots[j].constraints is None:
+                                child_CBS.robots[j].constraints = {local_time : constraint_list}
+                            elif local_time in child_CBS.robots[j].constraints:
                                 child_CBS.robots[j].constraints[local_time].extend(constraint_list)
                             else:
-                                child_CBS.robots[j].constraints = {local_time: constraint_list}
+                                child_CBS.robots[j].constraints[local_time] = constraint_list
                 if conflict_found:
                     child_CBS.generate_individual_plans()
                     succesors.append(child_CBS)
                     break_outer = True
             local_time += 1
-        print("returning succesors ", len(succesors))
-        print("__________________________")
-        for succesor in succesors:
-            print(succesor.plans)
-        print(succesors)
         if not succesors:
             self.no_conflicts = True
-        print("returned")
         return succesors
 
     # Return a list of list of actions

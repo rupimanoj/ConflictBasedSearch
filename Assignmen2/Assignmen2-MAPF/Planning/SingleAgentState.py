@@ -29,7 +29,7 @@ class SingleAgentState:
                 continue  # Ignore illegal actions
             constraints_obeyed = True
             for pos in occupies[0]: #before adding to succesor states check if they are in conflicting regions
-                if self.time_stamp + 1 in self.robot.constraints and tuple(pos) in self.robot.constraints[self.time_stamp + 1]:
+                if self.robot.constraints is not None and self.time_stamp + 1 in self.robot.constraints and tuple(pos) in self.robot.constraints[self.time_stamp + 1]:
                     constraints_obeyed = False
                     # print("XXXXX constraint found XXXXX")
                     break

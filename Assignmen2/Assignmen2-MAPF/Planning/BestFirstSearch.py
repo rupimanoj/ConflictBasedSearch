@@ -7,24 +7,22 @@ class BestFirstSearch:
     def plan(start_state):
         open = []
         closed = ClosedList()
-        if type(start_state).__name__ == 'CBS_State':
-            print("YYYYYY plan called YYYYYYYYYY")
         heappush(open, start_state)
         closed.insert(start_state)
         while open:
             u = heappop(open)
-            # print("pick CBS state, ", u)
             if u.is_goal():
                 ans = []
                 u.get_plan(ans)
-                # print(ans)
+                if type(u).__name__ == 'CBS_State':
+                    print(ans)
                 return ans
             else:
                 successors = u.expand()
                 if type(u).__name__ == 'CBS_State' and u.is_goal():
                     ans = []
                     u.get_plan(ans)
-                    # print(ans)
+                    print(ans)
                     return ans
                 for v in successors:
                     #  if v is in closed

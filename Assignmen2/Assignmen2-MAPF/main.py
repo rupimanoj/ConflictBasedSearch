@@ -13,9 +13,9 @@ def main():
 
     # map file
     current_dir = os.path.dirname(__file__)
-    scenario = 'Warehouse-MAPF-2_c.map' # Scenario to run
+    scenario = 'lak303d-MAPF-10.map' # Scenario to run
     map_path = os.path.join(current_dir, 'scenarios/' + scenario)
-    RobotNoCarry.ma_planner = 'CBS'  # Change to 'CBS' when running CBS
+    RobotNoCarry.ma_planner = 'CBS' #'maA*'  # Change to 'CBS' when running CBS
     map = mp(map_path)
     C.CELL_SIZE = max(int(500/map.height),1)
     display = dis(map)

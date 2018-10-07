@@ -12,7 +12,7 @@ from Planning.SingleAgentState import SingleAgentState as state
 
 class Robot:
 
-    def __init__(self, x,y,index, warehouse, job_manager, constraints={}):
+    def __init__(self, x,y,index, warehouse, job_manager, constraints=None):
         self.position_x = x
         self.position_y = y
         self.index = index
@@ -260,7 +260,7 @@ class RobotNoCarry(Robot):
 
     ma_planner = 'maA*'
 
-    def __init__(self, x,y,index, warehouse, job_manager, constraints={}):
+    def __init__(self, x,y,index, warehouse, job_manager, constraints=None):
         Robot.__init__(self,x,y,index, warehouse, job_manager, constraints)
 
 
