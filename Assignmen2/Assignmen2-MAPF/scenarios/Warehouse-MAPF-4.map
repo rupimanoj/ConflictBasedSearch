@@ -1,0 +1,7 @@
+type octile
+height 3
+width 6
+map
+r..S.r
+.S..S.
+.S.r.r

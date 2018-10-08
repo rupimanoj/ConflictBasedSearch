@@ -12,8 +12,6 @@ class SingleAgentState:
         self.g = g
         self.h = (abs(robot.position_x - robot.goal_x) + abs(robot.position_y - robot.goal_y))/2# TODO: Your job - Set a better heuristic value
         self.action = action
-        # self.conflicts = conflicts
-        # self.current_depth = current_depth
         self.time_stamp = time_stamp
 
     def expand(self):
