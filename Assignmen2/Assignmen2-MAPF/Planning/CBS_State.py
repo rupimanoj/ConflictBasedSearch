@@ -2,8 +2,6 @@ from Utils.constants import Action, NAV_ACTIONS
 import Utils.constants as C
 import copy
 
-count = 0
-
 class CBS_State:
 
     def __init__(self, robots, g, constraint, predecessor, plans):
@@ -46,10 +44,7 @@ class CBS_State:
             constraint_list.append((orig_pos_i[0], orig_pos_i[1]))
         return constraint_list
 
-    # iterate over all robots and call "underlying algorithm" - single agent with conflict set - edit Robot.py to include a conflict set
-    # then do a "get path" for each agent
-    # collect the results into apt structure!! - TODO figure out what this apt structure is
-    # also update g value based on paths at end for loop
+    # generate the plans for each robot respecting all current conflicts
     def generate_individual_plans(self):
         temp_plans = []
         max_plan_len = -1
@@ -70,11 +65,10 @@ class CBS_State:
 
         self.plans = temp_plans
 
+    # iterate over all robots and call "underlying algorithm" - single agent with conflict set - edited Robot.py to include a conflict dict
+    # then do a "get path" for each agent using generate_individual_plans
+    # collect the results into dict and update g value based on paths at end for loop
     def expand(self):
-        global count
-        count += 1
-        # print(count)
-        # print("expand called")
         if(self.plans == None):
             self.generate_individual_plans() #root node don't have plans initially'
         succesors = []
@@ -164,7 +158,6 @@ class CBS_State:
         return not self < other
 
     def __str__(self):
-        # not sure if this is correct...
         ans = ''
         for robot in self.robots:
             ans += "Robot[%d]-(%d,%d,%s,%d) " %(robot.index,robot.position_x, robot.position_y, robot.heading, robot.velocity)

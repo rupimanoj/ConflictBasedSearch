@@ -90,19 +90,8 @@ class Warehouse:
             #p, robots, g, actions
             root = MultiagentState(None,self.agents[0],0,None)
         elif planner == 'CBS':
-            #robots, g, constraint, predecessor, plans
-            # star_x = []
-            # star_y = []
-            # for agent in self.agents[0]:
-            #     start_x = agent.position_x
-            #     start_y = agent.position_y
-            # import copy
             root = CBS_State(self.agents[0], 0, None, None, None)
         ma_plan = BestFirstSearch.plan(root)
-        # if planner == 'CBS':
-        #     for agent in self.agents[0]:
-        #         agent.position_x = start_x
-        #         agent.position_y = start_y
         for x in range(len(ma_plan)):
             self.agents[0][x].plan = [Action.process,Action.process,Action.process,Action.process] + ma_plan[x]
 
